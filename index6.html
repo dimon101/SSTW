@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <title>Login Redirect Example</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        @import url('http://fonts.googleapis.com/css?family=Roboto');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #ffffff;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            position: relative;
+        }
+        section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 380px;
+            padding: 50px 30px;
+            border-radius: 10px;
+            box-shadow: 7px 7px 60px #000;
+            background: #fff;
+            animation: unfold 0.8s ease-in-out forwards;
+        }
+        @keyframes unfold {
+            0% {
+                transform: perspective(800px) rotateX(-90deg);
+                opacity: 0;
+            }
+            100% {
+                transform: perspective(800px) rotateX(0deg);
+                opacity: 1;
+            }
+        }
+        .logo-container {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 100px;
+
+        }
+        .header-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header-container h1 {
+            color: #000;
+            font-size: 2.5em;
+            font-weight: bold;
+            text-transform: capitalize;
+            margin-bottom: 10px;
+        }
+        .header-container .instruction {
+            color: grey;
+            font-size: 1em;
+        }
+        .page1_class1 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin: 20px 0;
+        }
+        .otp {
+            display: flex;
+            justify-content: center;
+        }
+        .otp input {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            width: 3em;
+            height: 3em;
+            text-align: center;
+            margin: 0 0.5em;
+        }
+        .control {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            padding: 0;
+        }
+        .control .btn {
+            margin-top: 20px;
+            color: #fff;
+            background: #000;
+            opacity: .7;
+            transition: background-color .3s ease;
+            border: none;
+            cursor: pointer;
+            text-transform: capitalize;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 30px;
+        }
+        .control .btn:hover,
+        .control .btn:focus {
+            background-color: #29F1C3;
+        }
+        .control .btn.shake {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0% { transform: translateX(-10px); }
+            20% { transform: translateX(10px); }
+            40% { transform: translateX(-10px); }
+            60% { transform: translateX(10px); }
+            80% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+        #errorMessage {
+            margin-top: 20px;
+            color: red;
+            visibility: hidden; /* Hide initially */
+        }
+        #errorMessage.visible {
+            visibility: visible; /* Show when the 'visible' class is added */
+        }
+    </style>
+</head>
+<body>
+    <section>
+        <div class="form-container">
+            <div class="header-container">
+                <h1>Login</h1>
+                <p class="instruction">Please enter the key here</p>
+            </div>
+            <div class="page1_class1" id="page1_id1">
+                <div class="otp">
+                    <otp-input :fields="4" v-model="otpValue"></otp-input>
+                </div>
+                <div class="control">
+                    <input type="button" class="btn" value="Login" id="loginBtn" @click="checkLogin" ref="loginBtn">
+                    <span id="errorMessage" :class="{ 'visible': showError }">Access Denied</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="logo-container"></div>
+    <script src="https://unpkg.com/vue@3.0.11/dist/vue.global.prod.js"></script>
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    otpValue: '', // Holds the combined OTP input
+                    showError: false, // Controls the visibility of the error message
+                };
+            },
+            methods: {
+                checkLogin() {
+                    if (this.otpValue === '2024') {
+                        window.location.href = 'https://sstw-grqcbp.mailerpage.io';
+                    } else {
+                        this.showError = true;
+                        this.$refs.loginBtn.classList.add('shake');
+                        setTimeout(() => {
+                            this.$refs.loginBtn.classList.remove('shake');
+                            this.showError = false;
+                        }, 2000); // Remove shake and hide error message after 2 seconds
+                    }
+                }
+            }
+        });
+
+        app.component('otp-input', {
+            props: ['modelValue', 'fields'],
+            emits: ['update:modelValue'],
+            template: `
+                <div class="otp">
+                    <input v-for="(_, index) in parseInt(fields)" :key="index" type="text" maxlength="1" class="border rounded w-10 h-10 text-center" @input="handleInput(index, $event)" />
+                </div>
+            `,
+            methods: {
+                handleInput(index, event) {
+                    const value = event.target.value;
+                    const otpArray = this.modelValue.split('');
+                    otpArray[index] = value;
+                    const newValue = otpArray.join('');
+                    this.$emit('update:modelValue', newValue);
+
+                    if (value && index < this.fields - 1) {
+                        event.target.nextElementSibling.focus();
+                    }
+                }
+            }
+        });
+
+        app.mount('#page1_id1');
+    </script>
+</body>
+</html>
